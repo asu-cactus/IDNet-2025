@@ -22,7 +22,7 @@ Download the datasets from [here](https://huggingface.co/datasets/cactuslab/IDNe
 ## Running the Experiments Scripts
 
 ### Running Bayesian Optimization
-To run the Hyperband search baseline, run the following command under the root directory of the project.
+To run the Bayesian Optimization baseline, run the following command under the root directory of the project.
 ```bash
 python experiments/Bayesian_search.py target_samples with_model lambda0 lambda1 candidate_models
 ```
