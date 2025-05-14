@@ -7,6 +7,7 @@ Python>=10.0 is required to run the project. To install all the dependencies, ei
 pip install -r requirements.txt
 ```
 
+
 ## Setting Up Datasets and Models
 #### Setting Up Models
 Download the pretrained models from [here](https://huggingface.co/datasets/cactuslab/IDNet-2025) and place the unzipped models folder inside the data/ directory.
@@ -17,9 +18,10 @@ Download the target domain images file from [here](https://drive.google.com/file
 #### Setting Up Synthetic Dataset
 Download the datasets from [here](https://huggingface.co/datasets/cactuslab/IDNet-2025) and place the unzipped folders inside the data/ directory.
 
-## Running the Scripts
-### Running the Experiments
-#### Running Bayesian Optimization
+
+## Running the Experiments Scripts
+
+### Running Bayesian Optimization
 To run the Hyperband search baseline, run the following command under the root directory of the project.
 ```bash
 python experiments/Bayesian_search.py target_samples with_model lambda0 lambda1 candidate_models
@@ -35,7 +37,8 @@ python experiments/Bayesian_search.py 20 0 1 1 ssim
 ```
 You may also execute experiments/run.py which provides sample commands to execute Bayesian_search.py.
 
-#### Running Hyperband Search Baseline
+
+### Running Hyperband Search Baseline
 To run the Hyperband search baseline, run the following command under the root directory of the project.
 ```bash
 python experiments/Hyperband_search.py param_r param_eta target_samples with_model candidate_models
