@@ -1,33 +1,33 @@
 {
-    "template_path": "datas/templates/template_ALB.png",
-    "sample_path": "datas/Images/reals",
-    "annotation_path": "datas/Annotations/ALB_original_annotation.json",
-    "generated_path": "datas/Generated_images/",
-    "training_samples": "datas/configures/sidtd_data_gold.json",
-    "fonts_path": "datas/Fonts/",
+    "template_path": "data/templates/template_ALB.png",
+    "sample_path": "data/Images/reals",
+    "annotation_path": "data/Annotations/ALB_original_annotation.json",
+    "generated_path": "data/Generated_images/",
+    "training_samples": "data/configures/sidtd_data_gold.json",
+    "fonts_path": "data/Fonts/",
     "models": [{
         "name": "vit-large",
-        "path": "/scratch/luluxie/fairness/datasets/population/models/vit_large_patch16_224_w_p_2e-06_1e-06_best.pth",
+        "path": "models/vit_large_patch16_224_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "resnet50",
-        "path": "/scratch/luluxie/fairness/datasets/population/models/resnet50_w_p_2e-06_1e-06_best.pth",
+        "path": "models/resnet50_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "inception-v3",
-        "path": "/scratch/luluxie/fairness/datasets/population/models/inception-v3_w_p_2e-06_1e-06_best.pth",
+        "path": "models/inception-v3_w_p_2e-06_1e-06_best.pth",
         "im_size": 299
     },
     {
         "name": "vgg16",
-        "path": "/scratch/luluxie/fairness/datasets/population/models/vgg16_w_p_2e-06_1e-06_best.pth",
+        "path": "models/vgg16_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "densenet",
-        "path": "/scratch/luluxie/fairness/datasets/population/models/densenet_w_p_2e-06_1e-06_best.pth",
+        "path": "models/densenet_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     }
     ],
