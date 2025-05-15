@@ -53,10 +53,10 @@ def get_mask(img, param):
     img_np = np.array(img)
     shape1 = img.size
     mask = np.zeros(shape1, dtype=np.uint8)
-    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['bottom-left'], corner='bottom-left'))
-    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['bottom-right'], corner='bottom-right'))
-    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['top-right'], corner='top-right'))
-    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['top-left'], corner='top-left'))
+    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['bottom_left'], corner='bottom-left'))
+    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['bottom_right'], corner='bottom-right'))
+    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['top_right'], corner='top-right'))
+    mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['top_left'], corner='top-left'))
 
     # True for background-white pixels
     #bg = np.all(img_np > threshold, axis=-1)
@@ -115,8 +115,8 @@ def create_shadow(ori_img, id_img, paper_img, param):
     paper_img.paste(id_img, id_coords, mask=bbox)
     return paper_img
 
-def simulate_scan(params, image_path):
-    img_pil = Image.open(image_path).convert("RGBA") # Keep alpha for resizing and pasting
+def simulate_scan(params):
+    img_pil = Image.open(params['input_file_path']).convert("RGBA") # Keep alpha for resizing and pasting
     img_np = np.array(img_pil)
     original_width, original_height = img_pil.size
 
@@ -146,81 +146,37 @@ def simulate_scan(params, image_path):
         img_np = cv2.GaussianBlur(img_np, (0, 0), sigmaX=params['blur_radius'], sigmaY=params['blur_radius'])
         img_pil = Image.fromarray(img_np)
 
-    if params.get('paper_texture_path'):
-        #try:
-        if True:
-            paper = Image.open(params['paper_texture_path']).convert("RGBA")
-            #paper = paper.resize((params['paper_width'], params['paper_height']))
-            paper_width, paper_height = paper.size
-            id_width, id_height = img_pil.size
-            if params.get('id_resized_shape'):
-                (target_width, target_height) = params.get('id_resized_shape') 
+    paper = Image.open(params['paper_texture_path']).convert("RGBA")
 
-            resized_id = img_pil.resize((target_width, target_height))
-            length = math.sqrt( target_width **2 + target_height ** 2)
-            start1 = random.randint(300, 1000)
-            start2 = random.randint(300, 1000)
-            paper_tmp = paper.crop((start1, start2, start1 + length, start2 + length))
+    paper_width, paper_height = paper.size
+    id_width, id_height = img_pil.size
+    if params.get('id_resized_shape'):
+        (target_width, target_height) = params.get('id_resized_shape') 
 
-            id_img = ori_img.resize((target_width, target_height))
-            resized_id = create_shadow(ori_img, id_img, paper_tmp, params)
+    resized_id = img_pil.resize((target_width, target_height))
+    length = math.sqrt( target_width **2 + target_height ** 2)
+    start1 = params['position1']
+    start2 = params['position2']
+    if start1 + length > paper_width:
+        start1 = paper_width - length
+        params['position1'] = start1
+    if start2 + length > paper_height:
+        start2 = paper_height - length
+        params['position2'] = start2
+    paper_tmp = paper.crop((start1, start2, start1 + length, start2 + length))
 
-            resized_id_width, resized_id_height = resized_id.size
-            #position = (x_off, y_off)
-            #position = (random_bbox[:2])
-            
+    id_img = ori_img.resize((target_width, target_height))
+    resized_id = create_shadow(ori_img, id_img, paper_tmp, params)
 
-            resized_id = resized_id.rotate(params['rotate'])
-            # Composite resized ID onto paper
-            if resized_id.mode in ('RGBA', 'LA'):
-                paper.paste(resized_id, (start1, start2), resized_id.split()[3])
-            else:
-                paper.paste(resized_id, (start1, start2))
-            final_image = paper.convert("RGB")
-            return paper
-    return None
+    resized_id_width, resized_id_height = resized_id.size
+
+    resized_id = resized_id.rotate(params['rotate'])
+    # Composite resized ID onto paper
+    paper.paste(resized_id, (start1, start2), resized_id.split()[3])
+    final_image = paper.convert("RGB")
+    return paper
 
 
-import os
-import random
-from util import *
-from utils import *
-
-area = "ALB"
-ori_scanned_path = "/scratch/luluxie/scanned_images/scan_rotated/images/alb_id/"
-template_real_path = f"/scratch/luluxie/Datageneration/fulldataset/{area}/tmp/"
-output_path = f"/scratch/luluxie/Datageneration/fulldataset/{area}/scanned/"
-template_fake_path = "/scratch/luluxie/SIDTD_Dataset/SIDTD/SIDTD/templates/Images_ori/fakes/"
-#output_path = "/scratch/luluxie/scanned_images/quality/generated_BO/"
-#output_path = "tmp/"
-paper_path = '../papers/'
-train_dataset = "scan_BO_data.json"
-confs = {"models": [{
-        "name": "vit-large",
-        "path": "/scratch/luluxie/scanned_images/models/vit_large_patch16_224_w_p_2e-06_1e-06_best.pth",
-        "im_size": 224
-    },
-    {
-        "name": "resnet50",
-        "path": "/scratch/luluxie/scanned_images/models/resnet50_w_p_2e-06_1e-06_best.pth",
-        "im_size": 224
-    },
-    {
-        "name": "inception-v3",
-        "path": "/scratch/luluxie/scanned_images/models/inception-v3_w_p_2e-06_1e-06_best.pth",
-        "im_size": 299
-    },
-    {
-        "name": "vgg16",
-        "path": "/scratch/luluxie/scanned_images/models/vgg16_w_p_2e-06_1e-06_best.pth",
-        "im_size": 224
-    },
-    {
-        "name": "densenet",
-        "path": "/scratch/luluxie/scanned_images/models/densenet_w_p_2e-06_1e-06_best.pth",
-        "im_size": 224
-    }
-    ]}
 
 def generate_scanned_images(brightness, contrast, sharpness_factor, noise_std, blur_radius, shadow_offset1, shadow_offset2, 
                   shadow_color, shadow_blur_radius, id_resized_shape1, id_resized_shape2, 
