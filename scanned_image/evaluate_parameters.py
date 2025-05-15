@@ -246,34 +246,34 @@ import random
 from util import *
 from utils import *
 
-template_real_path = "/scratch/luluxie/SIDTD_Dataset/SIDTD/SIDTD/templates/Images_ori/reals/"
-template_fake_path = "/scratch/luluxie/SIDTD_Dataset/SIDTD/SIDTD/templates/Images_ori/fakes/"
-output_path = "/scratch/luluxie/scanned_images/tmp/"
+template_real_path = "data/templates/Images_ori/reals/"
+template_fake_path = "data/templates/Images_ori/fakes/"
+output_path = "data/scanned_images/"
 paper_path = '../papers/'
 guided_datapaths = "guided_BO_data_quality.json"
 confs = {"models": [{
         "name": "vit-large",
-        "path": "/scratch/luluxie/scanned_images/quality/models/vit_large_patch16_224_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/vit_large_patch16_224_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "resnet50",
-        "path": "/scratch/luluxie/scanned_images/quality/models/resnet50_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/resnet50_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "inception-v3",
-        "path": "/scratch/luluxie/scanned_images/quality/models/inception-v3_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/inception-v3_w_p_2e-06_1e-06_best.pth",
         "im_size": 299
     },
     {
         "name": "vgg16",
-        "path": "/scratch/luluxie/scanned_images/quality/models/vgg16_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/vgg16_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "densenet",
-        "path": "/scratch/luluxie/scanned_images/quality/models/densenet_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/densenet_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     }
     ]}
