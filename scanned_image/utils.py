@@ -197,27 +197,27 @@ paper_path = '../papers/'
 train_dataset = "scan_BO_data.json"
 confs = {"models": [{
         "name": "vit-large",
-        "path": "/scratch/luluxie/scanned_images/models/vit_large_patch16_224_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/vit_large_patch16_224_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "resnet50",
-        "path": "/scratch/luluxie/scanned_images/models/resnet50_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/resnet50_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "inception-v3",
-        "path": "/scratch/luluxie/scanned_images/models/inception-v3_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/inception-v3_w_p_2e-06_1e-06_best.pth",
         "im_size": 299
     },
     {
         "name": "vgg16",
-        "path": "/scratch/luluxie/scanned_images/models/vgg16_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/vgg16_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     },
     {
         "name": "densenet",
-        "path": "/scratch/luluxie/scanned_images/models/densenet_w_p_2e-06_1e-06_best.pth",
+        "path": "data/models/densenet_w_p_2e-06_1e-06_best.pth",
         "im_size": 224
     }
     ]}
