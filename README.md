@@ -54,3 +54,14 @@ python experiments/Hyperband_search.py 700 3 20 0 ssim
 ```
 Also, experiments/run_hyperband.py can be executed, which runs Hyperband_search.py with example commands.
 
+### Running CycleGAN Baseline
+To run the CycleGAN baseline, run the following command under the root directory of the project.
+```bash
+python experiments/test_cyclegan.py dataset
+```
+Example command:
+To run the CycleGAN baseline, run the following command under the root directory of the project.
+```bash
+python experiments/test_cyclegan.py idnet2sidtd1
+```
+Additionally, experiments/cycle_run.sh runs test_cyclegan.py with example commands.
