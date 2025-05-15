@@ -10,7 +10,7 @@ pip install -r requirements.txt
 
 ## Setting Up Datasets and Models
 #### Setting Up Models
-Download the pretrained models from [here](https://huggingface.co/datasets/cactuslab/IDNet-2025) and place the unzipped models folder inside the data/ directory.
+Download the pretrained models from [here](https://huggingface.co/datasets/cactuslab/IDNet-2025/blob/main/models.tar.gz) and place the unzipped models folder inside the data/ directory.
 
 #### Setting Up Target Domain Images
 Download the target domain images file from [here](https://drive.google.com/file/d/1iqZ0rDuO0GSkc3Osrr7V_--JbvPOky5X/view?usp=sharing) and place the unzipped 'target_images' folder inside the data/ directory.
