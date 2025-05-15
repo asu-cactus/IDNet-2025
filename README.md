@@ -27,11 +27,11 @@ To run the Bayesian Optimization baseline, run the following command under the r
 python experiments/Bayesian_search.py target_samples with_model lambda0 lambda1 candidate_models
 ```
 In the above command, the parameter target_samples denotes the number of samples to be used (int), with_model denotes whether the optimization will be model-guided or not (0 or 1), lambda0 and lambda1 are Bayesian optimization hyperparameters, and candidate_models stand for the names of models (space separated) that will guide the optimization. Example commands are given below:
-##### Example of W/ Model-Guided Search
+##### Example of Search W/ Model-Guided Optimization
 ```bash
 python experiments/Bayesian_search.py 20 1 1 1 resnet50
 ```
-##### Example of W/O Model-Guided Search
+##### Example of Search W/ SSIM Only Objective
 ```bash
 python experiments/Bayesian_search.py 20 0 1 1 ssim
 ```
@@ -44,11 +44,11 @@ To run the Hyperband search baseline, run the following command under the root d
 python experiments/Hyperband_search.py param_r param_eta target_samples with_model candidate_models
 ```
 Here, param_r and param_eta represent maximum resources and successive halving parameters of the Hyperband search method. Other parameters target_samples, with_model, and candidate_models are similar to those in Bayesian search. Example commands:
-##### Example of W/ Model-Guided Search
+##### Example of Search W/ Model-Guided Optimization
 ```bash
 python experiments/Hyperband_search.py 700 3 20 1 resnet50
 ```
-##### Example of W/O Model-Guided Search
+##### Example of Search W/ SSIM Only Objective
 ```bash
 python experiments/Hyperband_search.py 700 3 20 0 ssim
 ```
