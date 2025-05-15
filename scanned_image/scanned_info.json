@@ -1,0 +1,48 @@
+{
+    "brightness": 1.0127652929351434,
+    "contrast": 1.4172715164766823,
+    "sharpness_factor": 1.0198838840929518,
+    "noise_std": 2.1314584979027673,
+    "blur_radius": 0.29632801488453964,
+    "shadow_offset": [
+        -2,
+        2
+    ],
+    "shadow_blur_radius": 0.39653822312153153,
+    "rotate": 20.64528239291853,
+    "position1": 797,
+    "position2": 1079,
+    "save_quality": 68,
+    "id_resized_shape": [
+        1013,
+        641
+    ],
+    "shadow_color": [
+        0,
+        0,
+        0,
+        128
+    ],
+    "top_left": [
+        60,
+        60
+    ],
+    "top_right": [
+        60,
+        60
+    ],
+    "bottom_left": [
+        60,
+        60
+    ],
+    "bottom_right": [
+        60,
+        60
+    ],
+    "input_file_path": "sample.png",
+    "output_folder": "./tmp",
+    "paper_texture_path": "papers/1.png",
+    "prefix_name": "scanned",
+    "output_json": "scanned_info.json",
+    "output_path": "./tmp/scanned_1_sample.png"
+}
