@@ -12,7 +12,7 @@ import sys
 import time
 
 def get_configs(area):
-    with open(f"datas/configures/{area}_parameters.json") as f:
+    with open(f"data/configures/{area}_parameters.json") as f:
         conf = json.load(f)
     return conf
 
