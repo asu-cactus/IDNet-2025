@@ -205,4 +205,3 @@ def simulate_scan(params):
     final_image = paper.convert("RGB")
     return paper
 
-
