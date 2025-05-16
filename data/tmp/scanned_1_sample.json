@@ -1,0 +1,49 @@
+{
+    "brightness": 0.8463849898053297,
+    "contrast": 1.038769878650852,
+    "sharpness_factor": 0.9574214095303764,
+    "noise_std": 2.533213375149952,
+    "blur_radius": 0.7539467322801112,
+    "shadow_offset": [
+        -1,
+        0
+    ],
+    "shadow_blur_radius": 1.8619828724371448,
+    "rotate": -42.887807346042464,
+    "position1": 888,
+    "position2": 816,
+    "save_quality": 72,
+    "id_resized_shape": [
+        1013,
+        641
+    ],
+    "shadow_color": [
+        0,
+        0,
+        0,
+        128
+    ],
+    "top_left": [
+        60,
+        60
+    ],
+    "top_right": [
+        60,
+        60
+    ],
+    "bottom_left": [
+        60,
+        60
+    ],
+    "bottom_right": [
+        60,
+        60
+    ],
+    "input_file_path": "../data/scanned_data/sample.png",
+    "output_image_folder": "../data/tmp",
+    "output_info_folder": "../data/tmp",
+    "paper_texture_path": "../data/scanned_data/1.png",
+    "prefix_name": "scanned",
+    "file_name": "scanned_1_sample.jpg",
+    "json_name": "scanned_1_sample.json"
+}

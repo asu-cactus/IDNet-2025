@@ -13,7 +13,7 @@ import time
 #from google_fonts.search_fonts import search_fonts
 
 def get_configs(area):
-    with open(f"datas/configures/{area}_parameters.json") as f:
+    with open(f"data/configures/{area}_parameters.json") as f:
         conf = json.load(f)
     return conf
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     parser.add_argument('--target_samples', type=int, default=10, help='Number of target samples to be used')
     parser.add_argument('--with_model', type=int, choices=[0, 1], default=1, help='Whether to use model guided method (1=yes, 0=no)')
     parser.add_argument('--candidate_models', nargs='*', default="resnet50 vit-large", help='List of candidate model names if using model guided method')
-    parser.add_argument('--config_info', type=str, default="datas/configures/ALB_parameters.json", help='Information about the segment and guided model')
+    parser.add_argument('--config_info', type=str, default="data/configures/ALB_parameters.json", help='Information about the segment and guided model')
     parser.add_argument('--fonts_path', type=str, default="small_fonts", help='Information about the segment and guided model')
     parser.add_argument('--output_file', type=str, default="ALB_parameters.json", help='Information about the segment and guided model')
 

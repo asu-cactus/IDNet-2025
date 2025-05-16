@@ -36,19 +36,19 @@ from custom_noise import add_gaussian_noise, add_salt_and_pepper_noise, add_pois
 
 def get_optimal_font_scale(text, width):
     fontsize = 1  # starting font size
-    sel_font =  get_font_scale()  # "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    sel_font =  get_font_scale()
     stop  = False  # portion of image width you want text width to be
     img_fraction = 1
     try:
         font = ImageFont.truetype(font=sel_font, size=fontsize ,encoding="unic")
     except:
-        sel_font = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+        sel_font = "data/fake_fonts/TTF/DejaVuSans.ttf"
         font = ImageFont.truetype(font=sel_font, size=fontsize ,encoding="unic")
 
     while (font.getsize(text)[0] < img_fraction*width) and (stop == False):
         # iterate until the text size is just larger than the criteria
         if font.getsize(text)[0] == 0:
-            sel_font =  "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+            sel_font =  "data/fake_fonts/TTF/DejaVuSans.ttf"
 
             if font.getsize(text)[1] == 0:
                 stop = True
@@ -64,7 +64,7 @@ def get_optimal_font_scale(text, width):
     return font
 
 
-def get_font_scale(inner_path: str = os.path.join(os.getcwd(), "datas", "fake_fonts", "TTF")):
+def get_font_scale(inner_path: str = os.path.join(os.getcwd(), "data", "fake_fonts", "TTF")):
 
     ## TODO solve
     try:
@@ -415,7 +415,7 @@ def evaluate_parameters_custom(xx, yy, font_size, stroke_width, xc, yc, zc,
                         font_style_idx, save_quality1, save_quality2, segment, confs, testing):
 
 # add file path to file
-    base_save_path = "/scratch/luluxie/tmp/"
+    base_save_path = "data/tmp"
     quality1 = int(save_quality1)
     quality2 = int(save_quality2)
     annotation_path = confs['annotation_path']

@@ -1,24 +1,87 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-# In[8]:
-
-
-import cv2
-import numpy as np
-from PIL import Image, ImageEnhance, ImageFilter, ImageOps
-from skimage import util
-import math
-import json
-from tqdm import tqdm
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1" 
 from PIL import Image, ImageEnhance, ImageFilter, ImageDraw
 import numpy as np
 import cv2
 import random
 import math
-from scipy.ndimage import gaussian_filter
+import torch                                                                                                                                                                                            
+from torch.utils.data import Dataset, DataLoader                                                                                                                                                        
+from torchvision import transforms                                                                                                                                                                      
+import time
+from tqdm import tqdm
+from sklearn.metrics import accuracy_score
 
+class ImageCSVDataset(Dataset):                                                                                                                                                                         
+    def __init__(self, input_list, transform=None):                                                                                                                                                     
+        self.input = input_list                                                                                                                                                                         
+        self.transform = transform                                                                                                                                                                      
+                                                                                                                                                                                                        
+    def __len__(self):                                                                                                                                                                                  
+        return len(self.input)                                                                                                                                                                          
+                                                                                                                                                                                                        
+    def __getitem__(self, idx):                                                                                                                                                                         
+        img_path = self.input[idx][0]                                                                                                                                                                   
+        image = Image.open(img_path).convert('RGB')                                                                                                                                                     
+        label = self.input[idx][1]                                                                                                                                                                      
+                                                                                                                                                                                                        
+        if self.transform:                                                                                                                                                                              
+            image = self.transform(image)                                                                                                                                                               
+                                                                                                                                                                                                        
+        return image, label, img_path                                                                                                                                                                   
+
+def eval_models(test_paths, confs, testing, candidate_models):                                                                                                                                                                                                                                                                
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    results = {}
+    since = time.time()                                                                                                                                                                                                                                                                                                   
+    for M in confs['models']:
+        name = M['name']
+        if not testing:
+            if name not in candidate_models:
+                continue
+        model_path = M['path']
+        im_size = M['im_size']
+        transform = transforms.Compose([                                                                                                                                                                        
+            transforms.Resize((im_size, im_size)),                                                                                                                                                                      
+            transforms.ToTensor(),                                                                                                                                                                              
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])                                                                                                                         
+        ])                                                                                                                                                                                                      
+        test_dataset = ImageCSVDataset(test_paths, transform=transform)                                                                                                                                        
+        test_loader = DataLoader(test_dataset, batch_size= 32, num_workers = 8, shuffle=False) 
+        acc_history = []                                                                                                                                                                                                                                                                                                      
+        best_acc = 0.0                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                              
+        model = torch.load(model_path, weights_only = False, map_location = device)                                                                                                                                                                                                                                                                                       
+        model.eval()                                                                                                                                                                                                                                                                                                          
+        model.to(device)                                                                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                              
+        running_corrects = 0                                                                                                                                                                                                                                                                                                  
+        All_labels = []
+        All_preds = []
+                                                                                                                                                                                                                                                                                                                              
+        for inputs, labels, filenames in tqdm(test_loader):                                                                                                                                                                                                                                                                   
+            inputs = inputs.to(device)                                                                                                                                                                                                                                                                                        
+            labels = labels.to(device)                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                              
+            with torch.no_grad():                                                                                                                                                                                                                                                                                             
+                outputs = model(inputs)                                                                                                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                                                                                              
+            _, preds = torch.max(outputs, 1)                                                                                                                                                                                                                                                                                  
+            All_labels.extend(labels.data.cpu().numpy().tolist())
+            All_preds.extend(preds.cpu().numpy().tolist())
+            values, indices = torch.sort(outputs, dim=1, descending=True)                                                                                                                                                                                                                                                     
+            running_corrects += torch.sum(preds == labels.data)                                                                                                                                                                                                                                                               
+        epoch_acc = running_corrects.double() / len(test_loader.dataset)                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                          
+        print('Model: {}, Acc: {:.4f}'.format(name, epoch_acc))                                                                                                                                                                                                                                                                                
+        results[name]= [All_preds, All_labels]
+                                                                                                                                                                                                                                                                                                                          
+    time_elapsed = time.time() - since                                                                                                                                                                                                                                                                                    
+    print('Validation complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                                          
+    return results                                                                                                                                                                                                                                                                                                    
 
 def oval_mask_in_corner(shape1, shape2, corner='top-left'):
     height, width = shape1
@@ -33,7 +96,7 @@ def oval_mask_in_corner(shape1, shape2, corner='top-left'):
     # Ellipse equation: (x/a)^2 + (y/b)^2 <= 1
     a = ellipse_width // 2
     b = ellipse_height // 2
-    ellipse = ((X - a)**2 / a**2 + (Y - b)**2 / b**2) >= 1
+    ellipse = ((X - a)**2 / (a**2 + 0.0001) + (Y - b)**2 / (b**2 + 0.0001)) >= 1
     # Place the ellipse in the specified corner
     if corner == 'top-left':
         mask[:b, :a] = np.logical_or(mask[:b, :a], ellipse[:b, :a])
@@ -58,43 +121,9 @@ def get_mask(img, param):
     mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['top_right'], corner='top-right'))
     mask = np.logical_or(mask, oval_mask_in_corner(shape1, param['top_left'], corner='top-left'))
 
-    # True for background-white pixels
-    #bg = np.all(img_np > threshold, axis=-1)
-    #bg = mask_process(bg)
-    # Binary mask: 255 = content, 0 = background
     mask_img = Image.fromarray(((~mask).astype(np.uint8) * 255).transpose()).convert("L")
     return mask_img          # <- ready for Image.paste
 
-def mask_process(mask):
-    h, w = mask.shape
-    tmp = np.full((h,w), False)
-    h1, w1 = 0, 0
-    for i in range(int(h/3)):
-        if mask[i , 0] == False:
-            h1 = i
-            break
-    for j in range(int(w/3)):
-        if mask[0, j] == False:
-            w1 = j
-            break
-    mask1 = Image.new("L", mask.shape, 0)
-    draw = ImageDraw.Draw(mask1)
-    bbox = (0, 0, w1 *2 + 15, h1 * 2 + 5)
-
-    # Draw white ellipse inside the bounding box
-    draw.ellipse(bbox, fill=255)
-    draw = np.array(mask1)
-    for i in range(h1):
-        for j in range(w1):
-            if draw[i,j] == 0:
-                tmp[i,j] = True
-                tmp[i, w - j - 1] = True
-                tmp[h - i - 1, j] = True
-                tmp[h - i - 1, w - j - 1] = True
-            else:
-                break
-    #blurred = gaussian_filter(tmp, sigma=0.15)
-    return tmp
 
 
 def create_shadow(ori_img, id_img, paper_img, param):
@@ -177,75 +206,3 @@ def simulate_scan(params):
     return paper
 
 
-
-def generate_scanned_images(brightness, contrast, sharpness_factor, noise_std, blur_radius, shadow_offset1, shadow_offset2, 
-                  shadow_color, shadow_blur_radius, id_resized_shape1, id_resized_shape2, 
-                        top_left1, top_left2, top_right1, top_right2, bottom_left1, bottom_left2, bottom_right1, bottom_right2,
-                       testing, candidate_models, with_model):
-
-    params = {}
-    params['brightness'] = 1.0 + random.uniform(-0.1, 0.5)
-    params['contrast'] = 1.0 + random.uniform(-0.1, 0.5)
-    params['sharpness_factor'] = 1.0 + random.uniform(-0.1, 0.5)
-    params['noise_std'] = random.uniform(0, 5)
-    params['blur_radius'] = random.uniform(0, 1)
-    params['shadow_offset'] = (int(shadow_offset1), int(shadow_offset2))
-    params['shadow_color'] = (0, 0, 0, int(shadow_color))
-    params['shadow_blur_radius'] = random.uniform(0, 5)
-
-    #params['brightness'] = brightness #1.0 + random.uniform(-0.5, 0.5)
-    #params['contrast'] = contrast #1.0 + random.uniform(-0.5, 0.5)
-    #params['sharpness_factor'] = sharpness_factor #1.0 + random.uniform(-0.5, 0.5)
-    #params['noise_std'] = noise_std #random.uniform(0, 5)
-    #params['blur_radius'] = blur_radius #random.uniform(0, 1)
-    #params['shadow_offset'] = (int(shadow_offset1), int(shadow_offset2))
-    #params['shadow_color'] = (0, 0, 0, int(shadow_color))
-    #params['shadow_blur_radius'] = shadow_blur_radius #random.uniform(0, 5)
-
-    params['id_resized_shape'] = (int(id_resized_shape1), int(id_resized_shape2))
-    params['top-left'] = (int(top_left1), int(top_left2))
-    params['top-right'] = (int(top_right1), int(top_right2))
-    params['bottom-left'] = (int(bottom_left1), int(bottom_left2))
-    params['bottom-right'] = (int(bottom_right1), int(bottom_right2))
-        
-    prefix = '_'.join(candidate_models)
-    generated_paths = []
-    real_paths = []
-    ssims = []
-    reals = os.listdir(template_real_path)
-    fakes = os.listdir(template_fake_path)
-    #target = random.choice(scans)
-    #if not testing:
-    #    choiced_images = scans[:50]
-    #else:
-    #    choiced_images = scans[70:]
-    tmppps = os.listdir(paper_path)
-    pps = [p for p in tmppps if p[-3:] == 'png']
-    print(pps)
-    for i, choiced in enumerate(tqdm(reals[2532:])):
-        if choiced[-3:] != 'png' :
-            continue
-        for _ in range(5):
-            pp = random.choice(pps)
-            #if pp[-3:] != 'png':
-            #    continue
-            params['paper_texture_path'] = os.path.join(paper_path, pp)
-            params['brightness'] = 1.0 + random.uniform(-0.5, 0.5)
-            params['contrast'] = 1.0 + random.uniform(-0.5, 0.5)
-            params['sharpness_factor'] = 1.0 + random.uniform(-0.5, 0.5)
-            params['noise_std'] = random.uniform(0, 5)
-            params['blur_radius'] = random.uniform(0, 1)
-            params['shadow_offset'] = (int(shadow_offset1), int(shadow_offset2))
-            params['shadow_color'] = (0, 0, 0, int(shadow_color))
-            params['shadow_blur_radius'] = random.uniform(0, 5)
-            params['rotate'] = random.uniform(-90, 90)
-            fake_path = os.path.join(output_path, f"fakes/{choiced[:-4]}_{pp[:-4]}.jpg")
-            #real_path = os.path.join(output_path, f"reals/{choiced[:-4]}_{pp[:-4]}.jpg")
-            #real_path = os.path.join(output_path, f"grc/{choiced[:-4]}_{pp[:-4]}.jpg")
-            real_path = os.path.join(output_path, f"{choiced[:-4]}_{pp[:-4]}.jpg")
-
-            template = os.path.join(template_real_path, choiced)
-            scanned_id_on_fixed_paper = simulate_scan(params, template)
-            scanned_id_on_fixed_paper.convert("RGB").save(real_path, quality=95)
-
-    return 0
