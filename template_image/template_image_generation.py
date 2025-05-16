@@ -18,7 +18,7 @@ parser.add_argument('--area', type=str, required=True, help='Area name (e.g., AL
 
 # Optional overrides (defaults are constructed from base_path + area)
 parser.add_argument('--parameters_path', type=str, help='Path to parameters JSON')
-parser.add_argument('--jsonpath', type=str, help='Path to the JSON file of searched parameter for each segment')
+parser.add_argument('--jsonpath', type=str, help='Path to the JSON file of PII filled to each template')
 parser.add_argument('--rmbgpath', type=str, help='Path to background-removed images, for portrait photo')
 parser.add_argument('--oppath', type=str, help='Path to the output of the generated images')
 parser.add_argument('--templatepath', type=str, help='Path to template image that we want fill the infomation in')
