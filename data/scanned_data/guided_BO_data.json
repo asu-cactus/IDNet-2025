@@ -1,0 +1,32 @@
+{
+    "train": [
+        [
+            "sample.png",
+            0
+        ],
+        [
+            "sample.png",
+            1
+        ]
+    ],
+    "val": [
+        [
+            "../data/scanned_data/sample.png",
+            1
+        ],
+        [
+            "../data/scanned_data/sample.png",
+            1
+        ]
+    ],
+    "test": [
+        [
+            "../data/scanned_data/sample.png",
+            1
+        ],
+        [
+            "../data/scanned_data/sample.png",
+            1
+        ]
+    ]
+}

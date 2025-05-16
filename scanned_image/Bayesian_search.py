@@ -7,14 +7,10 @@ from skimage.metrics import structural_similarity as ssim
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from bayes_opt import BayesianOptimization
 from bayes_opt.util import UtilityFunction
-from evaluate_parameters import evaluate_parameters_with_fraud
+from evaluate_parameters import evaluate_parameters
 import sys
 import time
 
-def get_configs(area):
-    with open(f"data/configures/{area}_parameters.json") as f:
-        conf = json.load(f)
-    return conf
 
 def optimization(pbounds, target_samples, testing, candidate_models, with_model):
 
@@ -23,7 +19,7 @@ def optimization(pbounds, target_samples, testing, candidate_models, with_model)
         f = lambda brightness, contrast, sharpness_factor, noise_std, blur_radius, shadow_offset1, shadow_offset2, 
         shadow_color, shadow_blur_radius, id_resized_shape1, id_resized_shape2, 
         top_left1, top_left2, top_right1, top_right2, bottom_left1, bottom_left2, bottom_right1, bottom_right2,
-        save_quality1, save_quality2: evaluate_parameters_with_fraud(
+        save_quality1, save_quality2: evaluate_parameters(
             brightness, contrast, sharpness_factor, noise_std, blur_radius, shadow_offset1, shadow_offset2, 
                   shadow_color, shadow_blur_radius, id_resized_shape1, id_resized_shape2,
             top_left1, top_left2, top_right1, top_right2, bottom_left1, bottom_left2, bottom_right1, bottom_right2,
@@ -50,27 +46,13 @@ def optimization(pbounds, target_samples, testing, candidate_models, with_model)
         n_iter=50,
         acquisition_function=utility
     )
-    '''
-    optimizer.maximize(
-        init_points=10,
-        n_iter=30,
-        acq='ei',  # Expected Improvement
-        f=lambda xx, yy, font_size, stroke_width, xc, yc, zc, blur_ratio: evaluate_parameters(
-            xx, yy, font_size, stroke_width, xc, yc, zc, blur_ratio,
-            template_path='AZ_Template.png',
-            sample_image_path='AZ_Sample.png',
-            font_file='fonts/Arial.ttf',
-            list_4d=['D02141248']
-        )
-    )
-    '''
     
     # Get the best parameters
     bps = optimizer.max['params']
     print("Best Parameters:", bps)
     
     # Evaluate the best parameters one more time to get the final SSIM and PSNR
-    best_sv_pv = evaluate_parameters_with_fraud(
+    best_sv_pv = evaluate_parameters(
         bps['brightness'], bps['contrast'], bps['sharpness_factor'], bps['noise_std'], bps['blur_radius'], 
         bps['shadow_offset1'], bps['shadow_offset2'], bps['shadow_color'], bps['shadow_blur_radius'], 
         bps['id_resized_shape1'], bps['id_resized_shape2'], 
@@ -82,7 +64,7 @@ def optimization(pbounds, target_samples, testing, candidate_models, with_model)
         with_model = with_model
     )
     print("Best Evaluation on validation data:", best_sv_pv)
-    best_sv_pv = evaluate_parameters_with_fraud(
+    best_sv_pv = evaluate_parameters(
         bps['brightness'], bps['contrast'], bps['sharpness_factor'], bps['noise_std'], bps['blur_radius'], 
         bps['shadow_offset1'], bps['shadow_offset2'], bps['shadow_color'], bps['shadow_blur_radius'], 
         bps['id_resized_shape1'], bps['id_resized_shape2'], 
