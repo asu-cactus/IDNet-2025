@@ -147,7 +147,7 @@ def get_configs(area):
 
 
 
-def optimization(pbounds, segment_key, confs, testing, candidate_models, with_model, param_r, param_eta):
+def optimization(pbounds, segment_key, confs, testing, candidate_models, with_model, param_r, param_eta, lambda0, lambda1):
     # Create evaluation closure that captures all needed parameters
     def evaluator(xx, yy, font_size, stroke_width, xc, yc, zc, 
                  font_style_idx, save_quality1, save_quality2):
@@ -158,7 +158,9 @@ def optimization(pbounds, segment_key, confs, testing, candidate_models, with_mo
             confs=confs,
             testing=testing,
             candidate_models=candidate_models,
-            with_model=with_model
+            with_model=with_model,
+            l0 = lambda0,
+            l1 = lambda1
         )
     
     # Initialize Hyperband with the wrapped evaluator
@@ -185,7 +187,9 @@ def optimization(pbounds, segment_key, confs, testing, candidate_models, with_mo
         confs=confs,
         testing=False,
         candidate_models=candidate_models,
-        with_model=with_model
+        with_model=with_model,
+        l0 = lambda0,
+        l1 = lambda1
     )
     print("Best Evaluation on validation data:", best_sv_pv)
     
@@ -197,7 +201,9 @@ def optimization(pbounds, segment_key, confs, testing, candidate_models, with_mo
         confs=confs,
         testing=True,
         candidate_models=candidate_models,
-        with_model=with_model
+        with_model=with_model,
+        l0 = lambda0,
+        l1 = lambda1
     )
     print("Best Evaluation on testing data:", best_sv_pv)
     
@@ -212,7 +218,9 @@ if __name__ == '__main__':
     param_eta = int(sys.argv[2])
     target_samples = int(sys.argv[3])
     with_model = int(sys.argv[4])
-    candidate_models = sys.argv[5:]
+    lambda0 = float(sys.argv[5])
+    lambda1 = float(sys.argv[6])
+    candidate_models = sys.argv[7:]
     print("candidate_models:", candidate_models)
     segment_key = area + "_" + segment
     confs = get_configs(area)
@@ -260,6 +268,6 @@ if __name__ == '__main__':
         'save_quality2': (60, 100)
     }
     
-    optimization(pbounds=pbounds, segment_key=segment_key, confs=confs, testing=False, candidate_models=candidate_models, with_model=with_model, param_r=param_r, param_eta=param_eta)
+    optimization(pbounds=pbounds, segment_key=segment_key, confs=confs, testing=False, candidate_models=candidate_models, with_model=with_model, param_r=param_r, param_eta=param_eta, lambda0=lambda0, lambda1=lambda1)
     time_elapsed = time.time() - since
     print('Hyperband complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
