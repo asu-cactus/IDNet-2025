@@ -1,4 +1,4 @@
-# Bayesian Optimization for Template Image Processing
+# Bayesian Optimization for Template Image Generation
 
 This repository contains scripts for applying **Bayesian Optimization (BO)** to template images and generating synthetic images using optimized parameters.
 
@@ -65,5 +65,5 @@ Provides shared utility functions for both the optimization and image generation
 
 ---
 
-To prevent abuse, we only provide a single generation file for ALB template generation with some parameters hard coded. For other regions or templates, the hyperparameters may differ slightly. Please contact us if you're interested in accessing additional scripts for research purposes.
+To prevent abuse, we only provide a single generation file for ALB template generation with some parameters hard-coded. For other regions or templates, the hyperparameters may differ slightly. Please contact us if you're interested in accessing additional scripts for research purposes.
 

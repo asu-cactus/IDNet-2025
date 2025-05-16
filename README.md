@@ -69,19 +69,8 @@ This include the CycleGAN training part and results evaluation part(test_cyclega
 
 
 ### Running Bayesian Optimization on Scanned Images
-To run the Bayesian Optimization on scanned images, run the following command under the root directory of the project.
-```bash
-python scanned_image/Bayesian_search.py target_samples with_model candidate_models
-```
-To generate scanned images, run scanned_image/scan_image_generation.py
+see [here](https://github.com/asu-cactus/IDNet-2025/tree/master/scanned_image#bayesian-optimization-for-scanned-image-processing) for more details.
 
 
 ### Running Bayesian Optimization on Template Images
-To run the Bayesian Optimization on template images, run the following command under the root directory of the project.
-```bash
-python template_image/Bayesian_search.py --area LOCATION_NAME --segment TEMPLATE_SEGMENT --target_samples NUM_SAMPLES --with_model IS_GUIDED --candidate_models MODEL_NAMES --config_info CONFIG_PATH --fonts_path PATH_TO_FONTS --output_file CONFIG_FILE
-```
-Example command:
-```bash
-python template_image/Bayesian_search.py --area ALB --segment surname --target_samples 10 --with_model 1 --candidate_models resnet50 vit-large --config_info data/configures/ALB_parameters.json --fonts_path small_fonts --output_file ALB_parameters.json
-```
+see [here](https://github.com/asu-cactus/IDNet-2025/tree/master/template_image#bayesian-optimization-for-template-image-processing) for more details.
