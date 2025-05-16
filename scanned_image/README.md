@@ -1,5 +1,5 @@
 
-# Bayesian Optimization for Scanned Image Processing
+# Bayesian Optimization for Scanned Image Generation
 
 This folder contains scripts related to applying Bayesian Optimization (BO) on scanned images and generating synthetic scanned versions using optimized parameters.
 
