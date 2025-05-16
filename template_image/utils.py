@@ -14,6 +14,49 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms                                                                                                                                                                      
 from sklearn.metrics import accuracy_score
 
+def write_parameters(xx, yy, font_size, stroke_width, xc, yc, zc,                                                                                                                                                                                                 
+                    font_style_idx, content, template, font_styles):                                                                                                                                                                                                          
+    font_file = font_styles[font_style_idx]                                                                                                                                                                                                                              
+    imp = ImageDraw.Draw(template)
+
+    xx = int(xx)                                                                                                                                                                                                                                                              
+    yy = int(yy)                                                                                                                                                                                                                                                              
+    font_size = int(font_size)                                                                                                                                                                                                                                                
+    stroke_width = int(stroke_width)                                                                                                                                                                                                                                          
+    xc = int(xc)                                                                                                                                                                                                                                                              
+    yc = int(yc)                                                                                                                                                                                                                                                              
+    zc = int(zc)                                                                                                                                                                                                                                                              
+    #xc = 0
+    #yc = 0
+    #zc = 0
+    test_mf = ImageFont.truetype(font_file, int(font_size))                                                                                                                                                                                                                   
+    text_width = imp.textlength(content, font=test_mf)                                                                                                                                                                                                                        
+    text_width = int(math.ceil(text_width))                                                                                                                                                                                                                                   
+    coord = (xx, yy, xx + text_width, yy + int(font_size))                                                                                                                                                                                                                    
+    im2 = template.crop(coord)                                                                                                                                                                                                                                                
+    im = ImageDraw.Draw(im2)                                                                                                                                                                                                                                                  
+    textcolor = (int(xc), int(yc), int(zc))                                                                                                                                                                                                                                   
+    imp.text((xx, yy), content, textcolor, font=test_mf, stroke_width=int(stroke_width))                                                                                                                                                                                         
+    #im2 = im2.filter(ImageFilter.GaussianBlur(radius=blur_ratio))                                                                                                                                                                                                             
+    return im2, coord
+
+def region_attributes(value = None, font_style = None, font_size = None, font_color = None, bbox = None):
+    attributes = {}
+    attributes['value'] = value
+    attributes['font_style'] = font_style
+    attributes['font_size'] = font_size
+    attributes['font_color'] = font_color
+    attributes['bbox'] = bbox
+    return attributes
+
+
+def read_json(path: str):
+    with open(path) as f:
+        return json.load(f)
+def write_json(data:dict, path:str):
+    with open(path, "w", encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=2)
+
 class ImageCSVDataset(Dataset):                                                                                                                                                                         
     def __init__(self, input_list, transform=None):                                                                                                                                                     
         self.input = input_list                                                                                                                                                                         
@@ -106,7 +149,7 @@ def eval_models(test_paths, confs, testing, candidate_models):
     return results                                                                                                                                                                                                                                                                                                    
 
 def evaluate_parameters(xx, yy, font_size, stroke_width, xc, yc, zc,  
-                        font_style_idx, save_quality, segment, confs, testing, candidate_models, with_model):
+                        font_style_idx, save_quality, segment, confs, testing, candidate_models, with_model, lambda0, lambda1):
 
 # add file path to file
     quality = int(save_quality)
@@ -165,7 +208,7 @@ def evaluate_parameters(xx, yy, font_size, stroke_width, xc, yc, zc,
         all_tests = eval_models(test_paths, confs, testing, candidate_models)                                                                                                                                                                                                                                                                
         all_samples = eval_models(sample_paths, confs, testing, candidate_models)                                                                                                                                                                                                                                                                
         accs = [accuracy_score(all_samples[key][0], all_tests[key][0]) for key in all_tests.keys()]
-        score = sum(accs)/len(accs) + (sum(ssims) / len(ssims))
+        score = lambda0 * (sum(accs)/len(accs)) + lambda1 * ((sum(ssims) / len(ssims)))
     else:
         score = sum(ssims) / len(ssims)
     if testing:

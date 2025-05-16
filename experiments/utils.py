@@ -597,8 +597,8 @@ def evaluate_cyclegan1(xx, yy, font_size, stroke_width, xc, yc, zc,
                 input_paths[key] = [input_path]                                                                                                                                                                                                                                                                                
         return input_paths 
 
-    templates = load_all_images(f'/scratch/luluxie/GAN/pytorch-CycleGAN-and-pix2pix/results/{dataset}/test_latest/images/')
-    real_paths = "/scratch/luluxie/GAN/pytorch-CycleGAN-and-pix2pix/datasets/idnet2sidtdtest/testB/"
+    templates = load_all_images(f'pytorch-CycleGAN-and-pix2pix/results/{dataset}/test_latest/images/')
+    real_paths = "pytorch-CycleGAN-and-pix2pix/datasets/idnet2sidtdtest/testB/"
     annotations = load_annotations(annotation_path)
     test_paths = []
     ssims = []

@@ -49,20 +49,6 @@ def optimization(pbounds, segment_key, confs, testing, candidate_models, with_mo
         n_iter=200,
         acquisition_function=utility
     )
-    '''
-    optimizer.maximize(
-        init_points=10,
-        n_iter=30,
-        acq='ei',  # Expected Improvement
-        f=lambda xx, yy, font_size, stroke_width, xc, yc, zc, blur_ratio: evaluate_parameters(
-            xx, yy, font_size, stroke_width, xc, yc, zc, blur_ratio,
-            template_path='AZ_Template.png',
-            sample_image_path='AZ_Sample.png',
-            font_file='fonts/Arial.ttf',
-            list_4d=['D02141248']
-        )
-    )
-    '''
     
     # Get the best parameters
     best_params = optimizer.max['params']

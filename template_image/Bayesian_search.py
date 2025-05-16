@@ -17,7 +17,7 @@ def get_configs(area):
         conf = json.load(f)
     return conf
 
-def optimization(pbounds, segment_key, confs, testing, candidate_models, with_model):
+def optimization(pbounds, segment_key, confs, testing, candidate_models, with_model, lambda0, lambda1):
 
     # Initialize Bayesian Optimization
     optimizer = BayesianOptimization(
@@ -27,7 +27,9 @@ def optimization(pbounds, segment_key, confs, testing, candidate_models, with_mo
             confs = confs,
             testing = testing,
             candidate_models = candidate_models,
-            with_model = with_model
+            with_model = with_model,
+            lambda0 = lambda0,
+            lambda1 = lambda1
         ),
         pbounds=pbounds,
         verbose=2,
@@ -62,7 +64,9 @@ def optimization(pbounds, segment_key, confs, testing, candidate_models, with_mo
         confs = confs,
         testing = False,
         candidate_models = candidate_models,
-        with_model = with_model
+        with_model = with_model,
+        lambda0 = lambda0,
+        lambda1 = lambda1
     )
     print("Best Evaluation on validation data:", best_sv_pv)
     best_sv_pv = evaluate_parameters(
@@ -73,7 +77,9 @@ def optimization(pbounds, segment_key, confs, testing, candidate_models, with_mo
         confs = confs,
         testing = True,
         candidate_models = candidate_models,
-        with_model = with_model
+        with_model = with_model,
+        lambda0 = lambda0,
+        lambda1 = lambda1
     )
     print("Best Evaluation on testing data:", best_sv_pv)
     return optimizer
@@ -88,9 +94,11 @@ if __name__ == '__main__':
     parser.add_argument('--segment', type=str, default="surname", help='Segment of the template')
     parser.add_argument('--target_samples', type=int, default=10, help='Number of target samples to be used')
     parser.add_argument('--with_model', type=int, choices=[0, 1], default=1, help='Whether to use model guided method (1=yes, 0=no)')
+    parser.add_argument('--lambda0', type=float, default=1, help='The fractions of similarity score')
+    parser.add_argument('--lambda1', type=float, default=1, help='The fractions of consistency score')
     parser.add_argument('--candidate_models', nargs='*', default="resnet50 vit-large", help='List of candidate model names if using model guided method')
     parser.add_argument('--config_info', type=str, default="data/configures/ALB_parameters.json", help='Information about the segment and guided model')
-    parser.add_argument('--fonts_path', type=str, default="small_fonts", help='Information about the segment and guided model')
+    parser.add_argument('--fonts_path', type=str, default="data/Fonts", help='Information about the segment and guided model')
     parser.add_argument('--output_file', type=str, default="ALB_parameters.json", help='Information about the segment and guided model')
 
     # Parse the arguments
@@ -159,7 +167,7 @@ if __name__ == '__main__':
         'font_style_idx': (0, len(font_files) - 1),
         'save_quality': (60, 100),
     }
-    optimizer = optimization(pbounds = pbounds, segment_key = segment_key, confs = confs, testing = False, candidate_models = candidate_models, with_model = with_model)
+    optimizer = optimization(pbounds = pbounds, segment_key = segment_key, confs = confs, testing = False, candidate_models = candidate_models, with_model = with_model, lambda0 = lambda0, lambda1 = lambda1)
     bps = optimizer.max['params']
     tmp = {}
     tmp['x_position'] = int(bps['xx'])

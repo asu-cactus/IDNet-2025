@@ -22,6 +22,7 @@ Download the datasets from [here](https://huggingface.co/datasets/cactuslab/IDNe
 ## Running the Experiments Scripts
 
 ### Running Bayesian Optimization
+In this Experiments, we used SIDTD tmplate dataset as our target domain and used in our experiments, you can download the SIDTD data [here](https://github.com/Oriolrt/SIDTD_Dataset/tree/main/SIDTD/data/DataLoader#run-example) or [here](https://tc11.cvc.uab.es/datasets/SIDTD_1/), then put the `reals` and 'fakes' folders inside the data/templates/ directory. 
 To run the Bayesian Optimization baseline, run the following command under the root directory of the project.
 ```bash
 python experiments/Bayesian_search.py target_samples with_model lambda0 lambda1 candidate_models
@@ -56,16 +57,15 @@ Also, experiments/run_hyperband.py can be executed, which runs Hyperband_search.
 
 
 ### Running CycleGAN Baseline
+Download the repo of CycleGAN [here](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix.git)
+Download the data used for this baseline [here](https://drive.google.com/file/d/1tPArY3u3PpSW8IgWtqjnASymyb-iEgFR/view?usp=sharing)
+
 To run the CycleGAN baseline, run the following command under the root directory of the project.
 ```bash
-python experiments/test_cyclegan.py dataset
+cd experiments
+bash cycle_run.sh
 ```
-Example command:
-To run the CycleGAN baseline, run the following command under the root directory of the project.
-```bash
-python experiments/test_cyclegan.py idnet2sidtd1
-```
-Additionally, experiments/cycle_run.sh runs test_cyclegan.py with example commands.
+This include the CycleGAN training part and results evaluation part(test_cyclegan.py)
 
 
 ### Running Bayesian Optimization on Scanned Images
