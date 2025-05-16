@@ -101,10 +101,10 @@ if __name__ == '__main__':
     font_list = locals()[f"{segment}_font_list"]
     #font_list = search_fonts(area, segment, 2)
     font_files = []
-    with open("./google_fonts/label_index_new.json") as f:
+    with open("./data/label_index_new.json") as f:
         label_indexs = json.load(f)
     for fl in font_list:
-        font_files.append(os.path.join('./google_fonts/newfonts', label_indexs[str(fl[0])]))
+        font_files.append(os.path.join('./data/newfonts', label_indexs[str(fl[0])]))
     confs['font_files'] = font_files
 
     val_datas = []

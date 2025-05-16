@@ -397,156 +397,6 @@ def eval_model(test_paths, confs):
     return All_preds, All_labels                                                                                                                                                                                                                                                                                                    
                                                                                                                                                                                                                                                                                                                           
                                                                                                                                                                                                                                                                                                                           
-def evaluate_parameters_custom(xx, yy, font_size, stroke_width, xc, yc, zc,  
-                        font_style_idx, save_quality1, save_quality2, segment, confs, testing):
-
-# add file path to file
-    base_save_path = "data/tmp"
-    quality1 = int(save_quality1)
-    quality2 = int(save_quality2)
-    annotation_path = confs['annotation_path']
-    template1 = confs['template_path']
-    oppath = confs['generated_path']
-    font_path = confs["fonts_path"]
-    real_path = f"{oppath}/reals"
-    fake_path = f"{oppath}/fakes"
-    try:
-        shutil.rmtree(real_path)
-        shutil.rmtree(fake_path)
-        os.mkdir(real_path)
-        os.mkdir(fake_path)
-    except:
-        pass
-    
-    if 'font_files' in confs:
-        font_styles = confs['font_files']
-    else:
-        font_styles = get_font_styles(font_path)
-    font_file = font_styles[int(font_style_idx)]
-
-    samples_path = confs['sample_path']
-    template1_image = Image.open(template1).convert("RGB")
-    area, segment_key = segment.split('_', 1)
-    bbox = confs[segment_key]['bbox']
-    if testing:
-        val_datas = confs['test_data']
-    else:
-        val_datas = confs['val_data']
-
-    templates = load_all_templates(samples_path, area)
-    annotations = load_annotations(annotation_path)
-    test_paths = []
-    fake_paths = []
-    ssims = []
-    sample_paths = []
-
-    df = pd.read_csv("Popular_Baby_Names.csv")
-    names = df["Child's First Name"]
-
-    print(df['Gender'].describe())
-    print(df['Ethnicity'].describe())
-
-    for filename, values in tqdm(annotations.items()):
-        if filename in templates and filename in val_datas:
-            for n_index, name in enumerate(tqdm(names)):
-                template2 = templates[filename]
-                template2_image = Image.open(template2).convert("RGB")
-                sample_np = np.array(template2_image.crop(bbox))
-                region = template1_image.crop(bbox)
-                template2_image.paste(region, bbox)
-
-                content = name #values[segment_key]['value']
-
-                imp = ImageDraw.Draw(template2_image)
-
-                test_mf = ImageFont.truetype(font_file, int(font_size))
-                text_width = imp.textlength(content, font=test_mf)
-                text_width = int(math.ceil(text_width))
-                xx = int(xx)
-                yy = int(yy)
-                coord = (xx, yy, xx + text_width, yy + int(font_size))
-                coord1 = (xx, yy, text_width, int(font_size))
-                textcolor = (int(xc), int(yc), int(zc))
-
-                imp.text((xx, yy), content, textcolor, font=test_mf, stroke_width=int(stroke_width))
-                generated_np = np.array(template2_image.crop(bbox))
-                sv, _ = ssim(sample_np, generated_np, full=True, multichannel=True, channel_axis=-1)
-                ssims.append(sv)
-                #pv = psnr(sample_np, generated_np)
-                #ssims.append(pv)
-
-                real_name = f"{base_save_path}/real_{filename}_{n_index}"
-                fake_name = f"{base_save_path}/fake_{filename}_{n_index}"
-                template2_image.save(real_name, format='JPEG', subsampling=0, quality=quality1)
-
-                shape = coord_to_shape(coord)
-                img = np.array(template2_image)
-                mask, _ = mask_from_info(img, shape)
-                fake_text_image =  inpaint_image(img=img, coord=coord1, mask=mask, text_str=content)
-
-                Image.fromarray(fake_text_image).save(fake_name, format='JPEG', subsampling=0, quality=quality2)
-                test_paths.append([real_name, 0])
-                fake_paths.append([fake_name, 1])
-
-            break
-    real_gau_paths_5 = add_gaussian_noise(test_paths, 0, 5)
-    fake_gau_paths_5 = add_gaussian_noise(fake_paths, 0, 5)
-    real_gau_paths_10 = add_gaussian_noise(test_paths, 0, 10)
-    fake_gau_paths_10 = add_gaussian_noise(fake_paths, 0, 10)
-    real_gau_paths_15 = add_gaussian_noise(test_paths, 0, 15)
-    fake_gau_paths_15 = add_gaussian_noise(fake_paths, 0, 15)
-
-    real_sp_paths_01 = add_salt_and_pepper_noise(test_paths, 0.01)
-    fake_sp_paths_01 = add_salt_and_pepper_noise(fake_paths, 0.01)
-    real_sp_paths_05 = add_salt_and_pepper_noise(test_paths, 0.05)
-    fake_sp_paths_05 = add_salt_and_pepper_noise(fake_paths, 0.05)
-
-    real_poisson_paths = add_poisson_noise(test_paths)
-    fake_poisson_paths = add_poisson_noise(fake_paths)
-
-
-
-    real_pred, real_labels = eval_model(test_paths, confs)                                                                                                                                                                                                                                                                
-    fake_pred, fake_labels = eval_model(fake_paths, confs)                                                                                                                                                                                                                                                                
-    df['real_results'] = get_binary_column(real_labels, real_pred)
-    df['fake_results'] = get_binary_column(fake_labels, fake_pred)
-
-    real_pred, real_labels = eval_model(real_gau_paths_5, confs)                                                                                                                                                                                                                                                                
-    fake_pred, fake_labels = eval_model(fake_gau_paths_5, confs)                                                                                                                                                                                                                                                                
-    df['real_gau_paths_5'] = get_binary_column(real_labels, real_pred)
-    df['fake_gau_paths_5'] = get_binary_column(fake_labels, fake_pred)
-
-    real_pred, real_labels = eval_model(real_gau_paths_10, confs)                                                                                                                                                                                                                                                                
-    fake_pred, fake_labels = eval_model(fake_gau_paths_10, confs)                                                                                                                                                                                                                                                                
-    df['real_gau_paths_10'] = get_binary_column(real_labels, real_pred)
-    df['fake_gau_paths_10'] = get_binary_column(fake_labels, fake_pred)
-
-    real_pred, real_labels = eval_model(real_gau_paths_15, confs)                                                                                                                                                                                                                                                                
-    fake_pred, fake_labels = eval_model(fake_gau_paths_15, confs)                                                                                                                                                                                                                                                                
-    df['real_gau_paths_15'] = get_binary_column(real_labels, real_pred)
-    df['fake_gau_paths_15'] = get_binary_column(fake_labels, fake_pred)
-
-    real_pred, real_labels = eval_model(real_sp_paths_01, confs)                                                                                                                                                                                                                                                                
-    fake_pred, fake_labels = eval_model(fake_sp_paths_01, confs)                                                                                                                                                                                                                                                                
-    df['real_sp_paths_01'] = get_binary_column(real_labels, real_pred)
-    df['fake_sp_paths_01'] = get_binary_column(fake_labels, fake_pred)
-
-    real_pred, real_labels = eval_model(real_sp_paths_05, confs)                                                                                                                                                                                                                                                                
-    fake_pred, fake_labels = eval_model(fake_sp_paths_05, confs)                                                                                                                                                                                                                                                                
-    df['real_sp_paths_05'] = get_binary_column(real_labels, real_pred)
-    df['fake_sp_paths_05'] = get_binary_column(fake_labels, fake_pred)
-
-    real_pred, real_labels = eval_model(real_poisson_paths, confs)                                                                                                                                                                                                                                                                
-    fake_pred, fake_labels = eval_model(fake_poisson_paths, confs)                                                                                                                                                                                                                                                                
-    df['real_poisson_paths'] = get_binary_column(real_labels, real_pred)
-    df['fake_poisson_paths'] = get_binary_column(fake_labels, fake_pred)
-
-    df.to_csv(confs['save_path'], index=False)
-    #acc = accuracy_score(all_samples, all_test)
-    #score = acc + 0.1 * (sum(ssims) / len(ssims))
-    score = sum(ssims) / len(ssims)
-    #print(f"Model acc: {acc}, Evaluation score: {score}")
-    return score
 
 def get_binary_column(label, predict):
     results = []
@@ -834,10 +684,10 @@ def evaluate_parameters(xx, yy, font_size, stroke_width, xc, yc, zc,
             sample_paths.append([template2, 0])
             sample_paths.append([fake_real_name, 1])
 
-    with open("sample_paths_0511.json", 'w') as file:
-        json.dump(sample_paths, file, indent=4)
-    with open("new_BO_paths_0511.json", 'w') as file:
-        json.dump(test_paths, file, indent=4)
+    #with open("sample_paths_0511.json", 'w') as file:
+    #    json.dump(sample_paths, file, indent=4)
+    #with open("new_BO_paths_0511.json", 'w') as file:
+    #    json.dump(test_paths, file, indent=4)
 
 
     if with_model:

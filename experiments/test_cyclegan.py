@@ -92,10 +92,10 @@ if __name__ == '__main__':
     confs = get_configs(area)
     font_list = [(106, 513), (122, 127), (64, 70), (103, 53), (69, 50), (115, 36), (59, 32), (12, 26), (104, 23), (105, 22), (81, 20), (65, 11), (50, 5), (47, 4), (129, 4), (142, 2), (97, 1), (75, 1)]
     font_files = []
-    with open("./google_fonts/label_index_new.json") as f:
+    with open("./data/label_index_new.json") as f:
         label_indexs = json.load(f)
     for fl in font_list:
-        font_files.append(os.path.join('./google_fonts/newfonts', label_indexs[str(fl[0])]))
+        font_files.append(os.path.join('./data/newfonts', label_indexs[str(fl[0])]))
     confs['font_files'] = font_files
 
     val_datas = []
